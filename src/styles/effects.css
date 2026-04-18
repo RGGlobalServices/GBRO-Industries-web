@@ -1,0 +1,826 @@
+/* ============================================================
+   GBRO INDUSTRIES — Advanced Effects & Modern Animations
+   Animated Borders | Card Shimmer | Glow System | Micro-interactions
+   Loaded AFTER index.css — intentionally overrides base styles
+   ============================================================ */
+
+/* ─── CSS HOUDINI: Animatable angle property ─────────────────
+   Enables conic-gradient animation via @keyframes.
+   Falls back gracefully in unsupported browsers.          */
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@property --glow-opacity {
+  syntax: '<number>';
+  initial-value: 0;
+  inherits: false;
+}
+
+/* ============================================================
+   1. ANIMATED GRADIENT BORDER — Featured Service Card
+   Uses background-clip: padding-box + border-box trick.
+   The conic-gradient rotates, creating a spinning colour ring.
+   ============================================================ */
+
+.service-card--featured {
+  border: 1.5px solid transparent;
+  background-image:
+    linear-gradient(135deg, rgba(124,58,237,0.18) 0%, rgba(0,212,255,0.12) 100%),
+    conic-gradient(
+      from var(--angle),
+      #7c3aed 0%,
+      #a855f7 25%,
+      #00d4ff 50%,
+      #a855f7 75%,
+      #7c3aed 100%
+    );
+  background-origin: padding-box, border-box;
+  background-clip:   padding-box, border-box;
+  -webkit-background-clip: padding-box, border-box;
+  animation: featuredBorderSpin 5s linear infinite;
+}
+
+@keyframes featuredBorderSpin {
+  to { --angle: 360deg; }
+}
+
+/* Disable the simple top-line ::before on featured (conic is enough) */
+.service-card--featured::before { display: none !important; }
+
+/* ============================================================
+   2. TOP ACCENT LINE — All service cards
+   Slides in from left on hover
+   ============================================================ */
+
+.service-card {
+  isolation: isolate;   /* create stacking context */
+}
+
+.service-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
+  border-radius: 2px 2px 0 0;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.service-card:hover::before {
+  transform: scaleX(1);
+}
+
+/* ============================================================
+   3. SHIMMER SWEEP — Service cards & Stat cards
+   Diagonal white-light reflection sweeps across card on hover.
+   ============================================================ */
+
+.service-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 25%,
+    rgba(255, 255, 255, 0.06) 45%,
+    rgba(255, 255, 255, 0.10) 50%,
+    rgba(255, 255, 255, 0.06) 55%,
+    transparent 75%
+  );
+  transform: translateX(-130%) skewX(-15deg);
+  transition: transform 0s;         /* instant reset */
+  pointer-events: none;
+  z-index: 3;
+}
+
+.service-card:hover::after {
+  transform: translateX(130%) skewX(-15deg);
+  transition: transform 0.65s ease; /* sweep across */
+}
+
+/* Stat card shimmer (::before is taken, ::after is free) */
+.stat-card {
+  isolation: isolate;
+}
+
+.stat-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    115deg,
+    transparent 25%,
+    rgba(255, 255, 255, 0.05) 48%,
+    rgba(255, 255, 255, 0.09) 50%,
+    rgba(255, 255, 255, 0.05) 52%,
+    transparent 75%
+  );
+  transform: translateX(-130%) skewX(-15deg);
+  transition: transform 0s;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.stat-card:hover::after {
+  transform: translateX(130%) skewX(-15deg);
+  transition: transform 0.6s ease;
+}
+
+/* ============================================================
+   4. ICON ORBIT RING — Service card icons
+   A spinning dual-colour ring appears around the icon on hover
+   ============================================================ */
+
+.service-card__icon {
+  position: relative;
+  overflow: visible;  /* allow ring to extend outside icon box */
+}
+
+.service-card__icon::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color:    var(--accent-cyan);
+  border-bottom-color: var(--accent-purple);
+  opacity: 0;
+  transform: rotate(0deg);
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.service-card:hover .service-card__icon::after {
+  opacity: 1;
+  animation: iconOrbit 1.4s linear infinite;
+}
+
+@keyframes iconOrbit {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================================
+   5. CORNER ACCENT DOT — Why cards
+   A pulsing neon dot appears in top-right corner on hover
+   (::after is taken by bottom border, ::before is free)
+   ============================================================ */
+
+.why-card {
+  isolation: isolate;
+}
+
+.why-card::before {
+  content: '';
+  position: absolute;
+  top: 14px; right: 14px;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.9), 0 0 20px rgba(0, 212, 255, 0.4);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.why-card:hover::before {
+  opacity: 1;
+  animation: cornerDotPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes cornerDotPulse {
+  0%, 100% { transform: scale(1);   opacity: 1; }
+  50%       { transform: scale(2);   opacity: 0.4; }
+}
+
+/* ============================================================
+   6. NEON GLOW BORDERS — Enhanced hover shadows
+   Multi-layer box-shadow creating a neon "lit" border effect
+   ============================================================ */
+
+.service-card:hover {
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(124, 58, 237, 0.5),
+    0 0 40px rgba(124, 58, 237, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+.service-card--featured:hover {
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.6),
+    0 0 60px rgba(0, 212, 255, 0.2),
+    0 0 100px rgba(124, 58, 237, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.stat-card:hover {
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(0, 212, 255, 0.35),
+    0 0 40px rgba(0, 212, 255, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.why-card:hover {
+  box-shadow:
+    0 20px 56px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(0, 212, 255, 0.25),
+    0 0 30px rgba(0, 212, 255, 0.08);
+}
+
+.testimonial-card:hover {
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(124, 58, 237, 0.35),
+    0 0 50px rgba(124, 58, 237, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* ============================================================
+   7. PORTFOLIO CARD — Underline animation on title
+   ============================================================ */
+
+.portfolio-card__info h3 {
+  display: inline-block;
+  position: relative;
+}
+
+.portfolio-card__info h3::after {
+  content: '';
+  display: block;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
+  border-radius: 1px;
+  margin-top: 4px;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.portfolio-card:hover .portfolio-card__info h3::after {
+  width: 100%;
+}
+
+/* Enhanced overlay entrance */
+.portfolio-card__overlay {
+  background: linear-gradient(
+    180deg,
+    rgba(5, 5, 15, 0.5) 0%,
+    rgba(5, 5, 15, 0.92) 60%,
+    rgba(10, 10, 30, 0.98) 100%
+  );
+  transform: translateY(8px);
+  transition: opacity 0.35s ease, transform 0.35s ease, backdrop-filter 0.35s ease;
+}
+
+.portfolio-card:hover .portfolio-card__overlay {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ============================================================
+   8. STAT CARD — Number glow & icon lift on hover
+   ============================================================ */
+
+.stat-card__num {
+  transition: text-shadow 0.35s ease, filter 0.35s ease;
+}
+
+.stat-card:hover .stat-card__num {
+  text-shadow: 0 0 20px rgba(0, 212, 255, 0.6), 0 0 40px rgba(124, 58, 237, 0.3);
+  filter: brightness(1.1);
+}
+
+.stat-card__icon {
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.stat-card:hover .stat-card__icon {
+  transform: scale(1.2) translateY(-4px);
+}
+
+/* ============================================================
+   9. TESTIMONIAL — Quote icon glow animation
+   ============================================================ */
+
+.testimonial-card__quote i {
+  transition: text-shadow 0.35s ease, color 0.35s ease;
+}
+
+.testimonial-card:hover .testimonial-card__quote i {
+  color: var(--accent-purple);
+  text-shadow:
+    0 0 20px rgba(124, 58, 237, 0.7),
+    0 0 40px rgba(124, 58, 237, 0.3);
+}
+
+/* ============================================================
+   10. BUTTON SHINE — Travelling highlight on primary buttons
+   (::before is taken by overlay, ::after is free)
+   ============================================================ */
+
+.btn--primary::after {
+  content: '';
+  position: absolute;
+  top: -50%; left: -100%;
+  width: 55%; height: 200%;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(255, 255, 255, 0.18),
+    transparent
+  );
+  transform: skewX(-20deg);
+  transition: left 0.55s ease;
+  pointer-events: none;
+}
+
+.btn--primary:hover::after { left: 145%; }
+
+/* ============================================================
+   11. SERVICE BADGE — Continuous shimmer animation
+   ============================================================ */
+
+.service-card__badge {
+  position: relative;
+  overflow: hidden;
+}
+
+.service-card__badge::after {
+  content: '';
+  position: absolute;
+  top: -50%; left: -120%;
+  width: 60%; height: 200%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.35),
+    transparent
+  );
+  transform: skewX(-15deg);
+  animation: badgeShimmer 3s ease-in-out 0.8s infinite;
+  pointer-events: none;
+}
+
+@keyframes badgeShimmer {
+  0%,  45% { left: -120%; }
+  60%, 100% { left: 150%;  }
+}
+
+/* ============================================================
+   12. ABOUT FEATURES LIST — Hover slide + icon spin
+   ============================================================ */
+
+.about__features li {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: default;
+}
+
+.about__features li:hover {
+  transform: translateX(8px);
+}
+
+.about__features li i {
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease;
+}
+
+.about__features li:hover i {
+  transform: scale(1.3) rotate(-12deg);
+  filter: drop-shadow(0 0 6px rgba(0, 212, 255, 0.9));
+}
+
+/* ============================================================
+   13. CONTACT INFO ITEMS — Slide right on hover
+   ============================================================ */
+
+.contact-info-item {
+  transition: transform 0.3s ease;
+  cursor: default;
+}
+
+.contact-info-item:hover {
+  transform: translateX(8px);
+}
+
+.contact-info-item__icon {
+  transition:
+    background 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.contact-info-item:hover .contact-info-item__icon {
+  background: rgba(0, 212, 255, 0.15);
+  border-color: rgba(0, 212, 255, 0.45);
+  box-shadow: 0 0 18px rgba(0, 212, 255, 0.25);
+}
+
+/* ============================================================
+   14. SECTION DOT GRID PATTERN — Subtle background texture
+   ============================================================ */
+
+.services::before,
+.portfolio::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    circle,
+    rgba(0, 212, 255, 0.055) 1px,
+    transparent 1px
+  );
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+  mask-image: radial-gradient(ellipse 85% 85% at center, black 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse 85% 85% at center, black 30%, transparent 80%);
+}
+
+/* ============================================================
+   15. MARQUEE DOTS — Colour-cycling glow
+   ============================================================ */
+
+.marquee-dot {
+  display: inline-block;
+  animation: marqueeDotCycle 3s ease-in-out infinite;
+}
+
+@keyframes marqueeDotCycle {
+  0%,  100% { color: var(--accent-cyan);   text-shadow: 0 0 8px rgba(0, 212, 255, 0.8); }
+  50%        { color: var(--accent-purple); text-shadow: 0 0 8px rgba(124, 58, 237, 0.8); }
+}
+
+/* Stagger adjacent dots slightly */
+.marquee-track > span:nth-child(4n) .marquee-dot,
+.marquee-track > span:nth-child(4n)  { animation-delay: 0.4s; }
+.marquee-track > span:nth-child(4n+2) { animation-delay: 0.8s; }
+.marquee-track > span:nth-child(4n+3) { animation-delay: 1.2s; }
+
+/* ============================================================
+   16. SECTION BG GLOW BREATHING — Ambient pulse
+   ============================================================ */
+
+.section__bg-glow {
+  animation: bgGlowBreathe 8s ease-in-out infinite;
+}
+
+.section__bg-glow--right {
+  animation-delay: 4s;
+}
+
+@keyframes bgGlowBreathe {
+  0%,  100% { opacity: 0.10; transform: translateY(-50%) scale(1);    }
+  50%        { opacity: 0.20; transform: translateY(-50%) scale(1.15); }
+}
+
+/* ============================================================
+   17. SERVICE CARDS — Subtle idle float (non-hover state)
+   ============================================================ */
+
+.services__grid .service-card:nth-child(1) {
+  animation: cardIdleFloat 7s ease-in-out 0s   infinite;
+}
+.services__grid .service-card:nth-child(2) {
+  animation: cardIdleFloat 8s ease-in-out 1.2s infinite;
+}
+.services__grid .service-card:nth-child(3) {
+  animation: cardIdleFloat 7.5s ease-in-out 0.6s infinite;
+}
+
+@keyframes cardIdleFloat {
+  0%,  100% { transform: translateY(0px);  }
+  50%        { transform: translateY(-6px); }
+}
+
+/* Halt float and apply hover transform explicitly */
+.service-card:hover {
+  animation: none !important;
+  transform: translateY(-8px) !important;
+}
+
+/* ============================================================
+   18. WHY CARD ICON — Spring scale + glow on hover
+   ============================================================ */
+
+.why-card__icon {
+  transition:
+    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.why-card:hover .why-card__icon {
+  transform: scale(1.15) rotate(-8deg);
+  background: rgba(0, 212, 255, 0.15);
+  border-color: rgba(0, 212, 255, 0.4);
+  box-shadow:
+    0 0 20px rgba(0, 212, 255, 0.3),
+    0 0 40px rgba(0, 212, 255, 0.1);
+}
+
+/* ============================================================
+   19. HERO BADGE — Travelling shimmer
+   ============================================================ */
+
+.hero__badge {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero__badge::after {
+  content: '';
+  position: absolute;
+  top: -50%; left: -120%;
+  width: 50%; height: 200%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 212, 255, 0.2),
+    transparent
+  );
+  animation: heroBadgeSweep 4s ease-in-out 2s infinite;
+  pointer-events: none;
+}
+
+@keyframes heroBadgeSweep {
+  0%,  40% { left: -120%; }
+  60%, 100% { left: 150%;  }
+}
+
+/* ============================================================
+   20. SOCIAL ICON BUTTONS — Lift + glow on hover
+   ============================================================ */
+
+.contact-social a,
+.footer__social a {
+  transition:
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-color 0.3s ease,
+    color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.contact-social a:hover,
+.footer__social a:hover {
+  transform: translateY(-5px) scale(1.1);
+  box-shadow: 0 8px 20px rgba(0, 212, 255, 0.25);
+}
+
+/* LinkedIn specific colour */
+.contact-social a[aria-label="LinkedIn"]:hover,
+.footer__social a[aria-label="LinkedIn"]:hover {
+  color: #0a66c2;
+  border-color: #0a66c2;
+  box-shadow: 0 8px 20px rgba(10, 102, 194, 0.3);
+}
+
+/* Instagram gradient on hover */
+.contact-social a[aria-label="Instagram"]:hover,
+.footer__social a[aria-label="Instagram"]:hover {
+  color: #e1306c;
+  border-color: #e1306c;
+  box-shadow: 0 8px 20px rgba(225, 48, 108, 0.3);
+}
+
+/* WhatsApp green */
+.contact-social a[aria-label="WhatsApp"]:hover,
+.footer__social a[aria-label="WhatsApp"]:hover {
+  color: #25d366;
+  border-color: #25d366;
+  box-shadow: 0 8px 20px rgba(37, 211, 102, 0.3);
+}
+
+/* ============================================================
+   21. NAVBAR LOGO — Subtle glow on hover
+   ============================================================ */
+
+.navbar__logo {
+  position: relative;
+  transition: filter 0.3s ease;
+}
+
+.navbar__logo:hover .logo-g {
+  filter: brightness(1.3) drop-shadow(0 0 8px rgba(0, 212, 255, 0.6));
+}
+
+/* ============================================================
+   22. WHATSAPP CTA CARD — Animated pulse border
+   ============================================================ */
+
+.whatsapp-cta {
+  animation: whatsappPulse 4s ease-in-out infinite;
+}
+
+@keyframes whatsappPulse {
+  0%,  100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.0); }
+  50%        { box-shadow: 0 0 0 6px rgba(37, 211, 102, 0.08); }
+}
+
+.whatsapp-cta > i:first-child {
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.whatsapp-cta:hover > i:first-child {
+  transform: scale(1.2) rotate(-10deg);
+}
+
+/* ============================================================
+   23. SCROLL REVEAL — Enhanced entrance variants
+   ============================================================ */
+
+.reveal--scale { transform: scale(0.88); }
+
+.reveal.in-view {
+  transition:
+    opacity 0.75s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ============================================================
+   24. SECTION TAG — Animated leading dot
+   ============================================================ */
+
+.section-tag {
+  position: relative;
+}
+
+/* Pulsing live indicator before each tag */
+.section-tag::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  margin-right: 6px;
+  animation: tagDotBlink 2s ease-in-out infinite;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+@keyframes tagDotBlink {
+  0%,  100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.6); transform: scale(1); }
+  50%        { opacity: 0.7; box-shadow: 0 0 0 5px rgba(0, 212, 255, 0); transform: scale(1.1); }
+}
+
+/* ============================================================
+   25. FOOTER BRAND HOVER
+   ============================================================ */
+
+.footer__brand .navbar__logo:hover .logo-bro {
+  color: rgba(255,255,255,0.85);
+}
+
+/* ============================================================
+   26. FOCUS RING — Accessible, on-brand
+   ============================================================ */
+
+:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 4px;
+  border-radius: 4px;
+  box-shadow: 0 0 0 5px rgba(0, 212, 255, 0.12);
+}
+
+/* ============================================================
+   27. PORTFOLIO FILTER BUTTONS — Active shimmer
+   ============================================================ */
+
+.filter-btn--active {
+  position: relative;
+  overflow: hidden;
+}
+
+.filter-btn--active::after {
+  content: '';
+  position: absolute;
+  top: -50%; left: -100%;
+  width: 50%; height: 200%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transform: skewX(-15deg);
+  animation: filterBtnShimmer 3s ease-in-out 1s infinite;
+  pointer-events: none;
+}
+
+@keyframes filterBtnShimmer {
+  0%,  40% { left: -100%; }
+  60%, 100% { left: 150%;  }
+}
+
+/* ============================================================
+   28. BACK TO TOP — Spin on hover
+   ============================================================ */
+
+.back-to-top i {
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.back-to-top:hover i {
+  transform: translateY(-3px) scale(1.2);
+}
+
+/* ============================================================
+   29. CTA BUTTON — Enhanced pulse shadow
+   ============================================================ */
+
+.btn--pulse {
+  animation: ctaBtnPulse 2.8s ease-in-out infinite;
+}
+
+@keyframes ctaBtnPulse {
+  0%,  100% {
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.2),
+                0 0 0px rgba(124, 58, 237, 0);
+  }
+  50% {
+    box-shadow: 0 0 50px rgba(0, 212, 255, 0.5),
+                0 0 80px rgba(124, 58, 237, 0.25);
+  }
+}
+
+/* ============================================================
+   30. MOUSE-TRACKING RADIAL SPOTLIGHT ON CARDS
+   JS sets --mouse-x / --mouse-y, CSS renders a soft glow
+   that follows the cursor inside each card.
+   ============================================================ */
+
+.service-card,
+.why-card,
+.stat-card,
+.testimonial-card {
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+}
+
+/* Spotlight layer rendered via background on the glow div */
+.service-card .service-card__glow {
+  background: radial-gradient(
+    circle 180px at var(--mouse-x) var(--mouse-y),
+    rgba(124, 58, 237, 0.22),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  inset: 0;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  transform: none;
+  filter: none;
+}
+
+.service-card:hover .service-card__glow {
+  opacity: 1;
+}
+
+/* Why card mouse glow — inline radial via background */
+.why-card::after {
+  /* ::after is taken by bottom border in index.css — use background instead */
+}
+
+/* We add a radial overlay via the existing ::after on why-card? No — it's taken.
+   Instead, use the card's own background-image as a second layer via CSS variable. */
+
+/* For stat, why, testimonial we use box-shadow trick — no extra DOM needed */
+.stat-card:hover,
+.testimonial-card:hover,
+.why-card:hover {
+  background-image: radial-gradient(
+    circle 200px at var(--mouse-x) var(--mouse-y),
+    rgba(0, 212, 255, 0.06),
+    transparent 70%
+  );
+}
+
+/* ============================================================
+   31. MOBILE: Disable heavy effects on low-end devices
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .services__grid .service-card { animation: none !important; }
+  .section__bg-glow             { animation: none; }
+  .why-card::before             { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration:   0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration:  0.01ms !important;
+  }
+}

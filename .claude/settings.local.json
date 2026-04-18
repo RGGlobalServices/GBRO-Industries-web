@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir \"c:\\\\current working project\\\\GBRO Industries\")",
+      "Bash(cmd /c \"dir \\\\\"c:\\\\current working project\\\\GBRO Industries\\\\\"\")",
+      "Bash(cmd /c \"mkdir \\\\\"c:\\\\current working project\\\\GBRO Industries\\\\css\\\\\" 2>nul && mkdir \\\\\"c:\\\\current working project\\\\GBRO Industries\\\\js\\\\\" 2>nul && echo done\")",
+      "Bash(cmd /c \"dir /s /b \\\\\"c:\\\\current working project\\\\GBRO Industries\\\\\"\")",
+      "Bash(cmd /c \"dir /b /s \\\\\"c:\\\\current working project\\\\GBRO Industries\\\\\"\")",
+      "Bash(findstr /v \"^$\")",
+      "Bash(npm install:*)"
+    ]
+  }
+}

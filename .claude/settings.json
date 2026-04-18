@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(cmd /c \"cd /d \\\\\"c:\\\\current working project\\\\GBRO Industries\\\\\" && npx vite build 2>&1\")",
+      "Bash(cmd /c \"cd /d \\\\\"c:\\\\current working project\\\\GBRO Industries\\\\\" && node_modules\\\\.bin\\\\vite build\")",
+      "Bash(cmd /c \"cd /d \\\\\"c:\\\\current working project\\\\GBRO Industries\\\\\" && node_modules\\\\.bin\\\\vite build 2>&1 && echo BUILD_OK\")",
+      "Bash(cmd /c \"cd /d \\\\\"c:\\\\current working project\\\\GBRO Industries\\\\\" && node_modules\\\\.bin\\\\vite build 2>&1 && echo BUILD_SUCCESS\")"
+    ]
+  }
+}
